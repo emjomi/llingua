@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Wllama } from "@wllama/wllama";
+    import { Wllama, type WllamaChatMessage } from "@wllama/wllama";
 
     const languages: string[] = [
         "English",
@@ -29,18 +29,22 @@
                 "HY-MT1.5-1.8B-Q4_K_M.gguf",
             );
         }
-        const stream = await wllama.createCompletion(
-            `Here's the translation of:\n\n${sourceText}\n\nfrom ${sourceLanguage} to ${targetLanguage}:\n\n`,
+        const messages: WllamaChatMessage[] = [
             {
-                nPredict: 50,
-                sampling: {
-                    temp: 0.5,
-                    top_k: 40,
-                    top_p: 0.9,
-                },
-                stream: true,
+                role: "system",
+                content: `Translate user message from ${sourceLanguage} into ${targetLanguage}, without additional explanation.`,
             },
-        );
+            { role: "user", content: sourceText },
+        ];
+        const stream = await wllama.createChatCompletion(messages, {
+            nPredict: 50,
+            sampling: {
+                temp: 0.5,
+                top_k: 40,
+                top_p: 0.9,
+            },
+            stream: true,
+        });
         for await (const chunk of stream) {
             translatedText = chunk.currentText;
         }
