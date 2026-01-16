@@ -37,11 +37,12 @@
             { role: "user", content: sourceText },
         ];
         const stream = await wllama.createChatCompletion(messages, {
-            nPredict: 50,
+            nPredict: 4096,
             sampling: {
-                temp: 0.5,
-                top_k: 40,
-                top_p: 0.9,
+                top_k: 20,
+                top_p: 0.6,
+                penalty_repeat: 1.05,
+                temp: 0.7,
             },
             stream: true,
         });
