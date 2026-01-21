@@ -16,7 +16,6 @@
             "./node_modules/@wllama/wllama/src/multi-thread/wllama.wasm",
     });
 
-    let sourceLanguage = $state(languages[0]);
     let targetLanguage = $state(languages[languages.length - 1]);
     let sourceText = $state("");
     let translatedText = $state("");
@@ -32,7 +31,7 @@
         const messages: WllamaChatMessage[] = [
             {
                 role: "system",
-                content: `Translate user message from ${sourceLanguage} into ${targetLanguage}, without additional explanation.`,
+                content: `Translate user message into ${targetLanguage}, without additional explanation.`,
             },
             { role: "user", content: sourceText },
         ];
@@ -59,18 +58,11 @@
     }
 </script>
 
-<div>
-    <select bind:value={sourceLanguage}>
-        {#each languages as language}
-            <option value={language}>{language}</option>
-        {/each}
-    </select>
-    <select bind:value={targetLanguage}>
-        {#each languages as language}
-            <option value={language}>{language}</option>
-        {/each}
-    </select>
-</div>
+<select bind:value={targetLanguage}>
+    {#each languages as language}
+        <option value={language}>{language}</option>
+    {/each}
+</select>
 
 <div>
     <textarea bind:value={sourceText} onkeydown={handleKeydown}></textarea>
