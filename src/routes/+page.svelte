@@ -1,5 +1,7 @@
 <script lang="ts">
     import { Wllama, type WllamaChatMessage } from "@wllama/wllama";
+    import wllamaSingle from "@wllama/wllama/src/single-thread/wllama.wasm?url";
+    import wllamaMulti from "@wllama/wllama/src/multi-thread/wllama.wasm?url";
 
     const languages: string[] = [
         "English",
@@ -10,10 +12,8 @@
     ];
 
     let wllama = new Wllama({
-        "single-thread/wllama.wasm":
-            "./node_modules/@wllama/wllama/src/single-thread/wllama.wasm",
-        "multi-thread/wllama.wasm":
-            "./node_modules/@wllama/wllama/src/multi-thread/wllama.wasm",
+        "single-thread/wllama.wasm": wllamaSingle,
+        "multi-thread/wllama.wasm": wllamaMulti,
     });
 
     let targetLanguage = $state(languages[languages.length - 1]);
