@@ -19,6 +19,7 @@
     let targetLanguage = $state(languages[languages.length - 1]);
     let sourceText = $state("");
     let translatedText = $state("");
+    let isDropdownOpen = $state(false);
 
     async function translate() {
         translatedText = "";
@@ -56,6 +57,15 @@
             await translate();
         }
     }
+
+    function toggleDropdown() {
+        isDropdownOpen = !isDropdownOpen;
+    }
+
+    function selectLanguage(language: string) {
+        targetLanguage = language;
+        isDropdownOpen = false;
+    }
 </script>
 
 <div class="translator-container">
@@ -70,11 +80,20 @@
 
         <div class="panel">
             <textarea readonly>{translatedText}</textarea>
-            <select class="target-language-select" bind:value={targetLanguage}>
-                {#each languages as language}
-                    <option value={language}>{language}</option>
-                {/each}
-            </select>
+            <div class="language-dropdown">
+                <button class="dropdown-trigger" onclick={toggleDropdown}>
+                    {targetLanguage}
+                </button>
+                {#if isDropdownOpen}
+                    <div class="dropdown-menu">
+                        {#each languages as language}
+                            <button onclick={() => selectLanguage(language)}>
+                                {language}
+                            </button>
+                        {/each}
+                    </div>
+                {/if}
+            </div>
         </div>
     </div>
     <p class="keyboard-hint">
@@ -155,8 +174,13 @@
         color: var(--color-muted);
     }
 
-    .target-language-select {
+    .language-dropdown {
         align-self: flex-start;
+        position: relative;
+    }
+
+    .dropdown-trigger,
+    .dropdown-menu button {
         padding: var(--spacing-md) var(--spacing-lg);
         background: transparent;
         border: none;
@@ -166,14 +190,33 @@
         font-size: var(--font-size-md);
         font-family: inherit;
         cursor: pointer;
+        text-align: left;
     }
 
-    .target-language-select:hover {
+    .dropdown-trigger:hover,
+    .dropdown-menu button:hover {
         background-color: var(--color-muted);
     }
 
-    .target-language-select:focus {
+    .dropdown-trigger:focus,
+    .dropdown-menu button:hover {
         background-color: var(--color-accent);
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        margin-top: var(--spacing-sm);
+        padding: var(--spacing-sm);
+        background-color: var(--color-panel);
+        border-radius: var(--spacing-md);
+        box-shadow: var(--shadow);
+    }
+
+    .dropdown-menu button {
+        display: block;
+        min-width: 100%;
     }
 
     .keyboard-hint {
