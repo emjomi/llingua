@@ -20,8 +20,14 @@
     let sourceText = $state("");
     let translatedText = $state("");
     let isDropdownOpen = $state(false);
+    let abortController: AbortController | null = null;
 
     async function translate() {
+        if (abortController) {
+            abortController.abort();
+        }
+        abortController = new AbortController();
+
         translatedText = "";
         if (!wllama.isModelLoaded()) {
             await wllama.loadModelFromHF(
@@ -36,18 +42,25 @@
             },
             { role: "user", content: sourceText },
         ];
-        const stream = await wllama.createChatCompletion(messages, {
-            nPredict: 4096,
-            sampling: {
-                top_k: 20,
-                top_p: 0.6,
-                penalty_repeat: 1.05,
-                temp: 0.7,
-            },
-            stream: true,
-        });
-        for await (const chunk of stream) {
-            translatedText = chunk.currentText;
+        try {
+            const stream = await wllama.createChatCompletion(messages, {
+                nPredict: 4096,
+                sampling: {
+                    top_k: 20,
+                    top_p: 0.6,
+                    penalty_repeat: 1.05,
+                    temp: 0.7,
+                },
+                stream: true,
+                abortSignal: abortController.signal,
+            });
+            for await (const chunk of stream) {
+                translatedText = chunk.currentText;
+            }
+        } catch (error) {
+            if (error.name !== "AbortError") {
+                throw error;
+            }
         }
     }
 
